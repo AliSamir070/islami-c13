@@ -10,6 +10,7 @@ import 'package:islami_c13/ui/home/widgets/SuraWidget.dart';
 
 import '../../../model/SuraModel.dart';
 import '../../../style/AssetsManager.dart';
+import '../../../style/PrefsHelper.dart';
 import '../widgets/RecentlySuraWidget.dart';
 
 class QuranTab extends StatefulWidget {
@@ -22,6 +23,12 @@ class _QuranTabState extends State<QuranTab> {
 
   String searchValue = "";
   List<SuraModel> mostRecentList = [];
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    mostRecentList = PrefHelper.getRecentList();
+  }
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -94,24 +101,27 @@ class _QuranTabState extends State<QuranTab> {
                 SizedBox(height: 20,),
                 if(searchValue.isEmpty)
                   ...[
-                    Text(StringsManager.mostRecently,style: TextStyle(
-                        fontSize: 16,
-                        fontFamily: "Janna",
-                        fontWeight: FontWeight.w700,
-                        color: ColorsManager.searchTextColor
-                    ),),
-                    SizedBox(height: 10,),
-                    Expanded(
-                      flex: 2,
-                      child: ListView.separated(
-                          scrollDirection: Axis.horizontal,
-                          itemBuilder: (context, index) =>RecentlySuraWidget(
-                            suraModel:mostRecentList[index] ,
-                          ) ,
-                          separatorBuilder: (context, index) => SizedBox(width: 10,),
-                          itemCount: mostRecentList.length
+                    if(mostRecentList.isNotEmpty)
+                    ...[
+                      Text(StringsManager.mostRecently,style: TextStyle(
+                          fontSize: 16,
+                          fontFamily: "Janna",
+                          fontWeight: FontWeight.w700,
+                          color: ColorsManager.searchTextColor
+                      ),),
+                      SizedBox(height: 10,),
+                      Expanded(
+                        flex: 2,
+                        child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            itemBuilder: (context, index) =>RecentlySuraWidget(
+                              suraModel:mostRecentList[index] ,
+                            ) ,
+                            separatorBuilder: (context, index) => SizedBox(width: 10,),
+                            itemCount: mostRecentList.length
+                        ),
                       ),
-                    ),
+                    ],
                     Text(StringsManager.surasList,style: TextStyle(
                         fontSize: 16,
                         fontFamily: "Janna",
@@ -128,9 +138,17 @@ class _QuranTabState extends State<QuranTab> {
                           :suraList.length,
                       itemBuilder: (context, index) => SuraWidget(
                         addToRecent: (){
+                          for(int i=0;i<mostRecentList.length;i++){
+                            if(mostRecentList[i].suraNameEn == (searchValue.isNotEmpty
+                                ?filterList[index].suraNameEn
+                                :suraList[index].suraNameEn)){
+                              mostRecentList.removeAt(i);
+                            }
+                          }
                           mostRecentList.insert(0,searchValue.isNotEmpty
                               ?filterList[index]
                               :suraList[index]);
+                          PrefHelper.addRecentList(mostRecentList);
                           setState(() {
 
                           });
