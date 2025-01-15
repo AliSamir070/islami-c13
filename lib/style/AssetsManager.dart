@@ -16,4 +16,5 @@ abstract final class AssetsManager{
   static const String suraNumber = "assets/images/sura_number.svg";
   static const String time = "assets/images/time.svg";
   static const String timeBack = "assets/images/time_back.png";
+  static const String hadithBack = "assets/images/hadith_back.png";
 }
